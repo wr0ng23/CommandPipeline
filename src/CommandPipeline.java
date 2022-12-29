@@ -1,17 +1,16 @@
 import java.util.*;
 
-public class commandPipeline {
+public class CommandPipeline {
     private int allCountOfTics = 0; // общее количество тиков для конвейрной работы
     private final int countOfCommands; // всего количество команд для выполнения
     private int countOfCommandsNow = 1; // количество команд выложенных на конвейер
-    private boolean flag = false; // флаг, если команда для записи была выполнена и ее необходимо поставить в режим ожидания
     private final Command[] commands; // Изначально массив команд для выполнения
-    private ArrayList<Command> queue = new ArrayList<>(); // очередь для команд, которые должны выполнить свои
-    // стадди, чтобы передвинуть конвейер дальше
+    private ArrayList<Command> queue = new ArrayList<>(); // очередь для команд, которые должны выполнить свои стадии,
+    // чтобы передвинуть конвейер дальше
     private ArrayList<Command> queueForWritingInMemoryCommands = new ArrayList<>(); // очередь для команд, которые
     // пишут в память на данной стадии
 
-    public commandPipeline(int countOfCommands) {
+    public CommandPipeline(int countOfCommands) {
         this.countOfCommands = countOfCommands;
         commands = new Command[countOfCommands];
 
@@ -23,7 +22,7 @@ public class commandPipeline {
     public void printTicsForAllCommandsPipelineEx() {
         System.out.println("Конвейреная обработка команд");
         for (int i = 0; i < countOfCommands; ++i) {
-            System.out.println("Команда: " + (i + 1) + " - " + commands[i].getcountOfClockCyclesForPipelineEx());
+            System.out.println("Команда: " + (i + 1) + " - " + commands[i].getCountOfClockCyclesForPipelineEx());
         }
     }
 
@@ -71,25 +70,28 @@ public class commandPipeline {
 
     private void executeCommandsAtTheCurrentStage() {
         while (!checkForPromotion()) {
-            if (!queueForWritingInMemoryCommands.isEmpty()) {
-                var c = queueForWritingInMemoryCommands.get(0);
-                if (c.isCanGoToAnotherStage()) {
-                    c.setWaiting();
-                    queueForWritingInMemoryCommands.remove(0);
-                    flag = true;
-                }
-
-                if (flag && !queueForWritingInMemoryCommands.isEmpty()) {
-                    c = queueForWritingInMemoryCommands.get(0);
-                    c.unsetWaiting();
-                    flag = false;
-                }
-
-                setCommandsWaiting(c);
-            }
+            Command c = choiceOfCommandForWritingInMemory();
             performActionsForCommands();
+            checkForNewCommandForWritingInMemory(c);
             allCountOfTics++;
         }
+    }
+
+    private void checkForNewCommandForWritingInMemory(Command c) {
+        if (c.isCanGoToAnotherStage()) {
+            c.setWaiting();
+            queueForWritingInMemoryCommands.remove(0);
+        }
+    }
+
+    private Command choiceOfCommandForWritingInMemory() {
+        Command c = new Command();
+        if (!queueForWritingInMemoryCommands.isEmpty()) {
+            c = queueForWritingInMemoryCommands.get(0);
+            setCommandsWaiting();
+            c.unsetWaiting();
+        }
+        return c;
     }
 
     private void createQueuesOfCurrentCommands() {
@@ -115,11 +117,9 @@ public class commandPipeline {
         }
     }
 
-    private void setCommandsWaiting(Command c2) {
+    private void setCommandsWaiting() {
         for (var c : queueForWritingInMemoryCommands) {
-            if (c.isWritesToMemory() && !c.equals(c2)) {
-                c.setWaiting();
-            }
+            c.setWaiting();
         }
     }
 

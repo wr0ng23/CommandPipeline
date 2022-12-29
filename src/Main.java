@@ -2,7 +2,10 @@ public class Main {
     private final static int countOfCommands = 200;
 
     public static void main(String[] args) {
-        commandPipeline pipeline = new commandPipeline(countOfCommands);
+        System.out.println("Настройки программы:\nP1: " + Parameters.P1 + "\nN: " + Parameters.N + "\nP2: "
+                + Parameters.P2 + "\nM: " + Parameters.M + "\nКоличество команд: " + countOfCommands + "\n");
+
+        CommandPipeline pipeline = new CommandPipeline(countOfCommands);
         pipeline.startThePipeline();
 
         System.out.println("Для конвейрной работы общее время выполнения всех команд: "
@@ -17,10 +20,8 @@ public class Main {
                 + pipeline.getAvgSeqTics());
         pipeline.printTicsForAllCommandsSeqEx();
 
-
         String result =
                 String.format("%.3f", (double)pipeline.getAllSeqTics() / (double) pipeline.getAllPipelineOfTics());
-        System.out.println("\nКонвейер дает выйгрыш в "
-                + result + " раз");
+        System.out.println("\nКонвейер дает выйгрыш в " + result + " раз");
     }
 }

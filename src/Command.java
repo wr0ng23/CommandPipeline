@@ -45,19 +45,6 @@ public class Command {
         isWaiting = false;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Command command = (Command) o;
-        return countOfClockCyclesForSeqEx == command.countOfClockCyclesForSeqEx && countOfClockCyclesForPipelineEx
-                == command.countOfClockCyclesForPipelineEx && Double.compare(command.randomNumber, randomNumber)
-                == 0 && Double.compare(command.randomNumberForOperand2, randomNumberForOperand2) == 0 && counter
-                == command.counter && currentStatusOfCommand == command.currentStatusOfCommand && canGoToAnotherStage
-                == command.canGoToAnotherStage && writesToMemory == command.writesToMemory && isWaiting
-                == command.isWaiting && isFinished == command.isFinished;
-    }
-
     public boolean isCanGoToAnotherStage() {
         return canGoToAnotherStage;
     }
@@ -70,7 +57,7 @@ public class Command {
         return countOfClockCyclesForSeqEx;
     }
 
-    public int getcountOfClockCyclesForPipelineEx() {
+    public int getCountOfClockCyclesForPipelineEx() {
         return countOfClockCyclesForPipelineEx;
     }
 
@@ -115,13 +102,9 @@ public class Command {
 
     private void selectOperandOrCommand(double probability, int numberOfClockCycles, double randomNumber) {
         if (randomNumber > probability) { // если число больше заданной вероятности, выбор операндов или вычисление
-            // результата будет выполняться N или M тактов
-            counter++;
-            if (counter != numberOfClockCycles) { // проверка не прошло ли нужное количество тактов для совершения
-                // перехода к следуещему этапу
-                canGoToAnotherStage = false;
-            } else {
-                counter = 0;
+            counter++;                   // результата будет выполняться N или M тактов
+            if (counter == numberOfClockCycles) { // проверка не прошло ли нужное количество тактов для совершения
+                counter = 0;                     // перехода к следуещему этапу
                 canGoToAnotherStage = true;
             }
         } else {
